@@ -26,6 +26,18 @@ app.use((req, res, next) => {
 })
 
 // USER
+// READ USER
+app.post("/verifyUser", (req, res) => {
+    const email = req.body.email
+
+    const sql = `SELECT email FROM user WHERE email = "${email}"`
+
+    connection.query(sql, (err, result) => {
+        if (err) throw err;
+        console.log("Utilisateur déja existant");
+    })
+})
+
 // INSERT USER
 app.post("/addUser", (req, res)  => {
     const surname = req.body.surname
@@ -38,12 +50,22 @@ app.post("/addUser", (req, res)  => {
     const date = req.body.date
     const status = req.body.status
 
-    const sql = `INSERT INTO user(surname, name, firstname, email, password, born, user_type, city, travel_time) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)`
-    const values = [surname, name, firstname, email, password, city, travel,date, status]
+    const sql = `SELECT email FROM user WHERE email = "${email}"`
 
-    connection.query(sql, values, (err, result) => {
+    connection.query(sql, (err, result) => {
         if (err) throw err;
-        console.log("Utilisateur ajoutée en BDD");
+        if (result.length < 0) {
+            const sql = `INSERT INTO user(surname, name, firstname, email, password, born, user_type, city, travel_time) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)`
+            const values = [surname, name, firstname, email, password, city, travel,date, status]
+        
+            connection.query(sql, values, (err, result) => {
+                if (err) throw err;
+                console.log("Utilisateur ajoutée en BDD");
+            })
+        } else {
+            console.log("Utilisateur déja existant");
+            res.send(JSON.stringify("Utilisateur déja existant"))
+        }
     })
 })
 
