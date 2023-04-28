@@ -6,11 +6,8 @@ const { key, keyPub } = require("../../keys");
 
 router.post("/", async (req, res) => {
   const { email, password } = req.body;
-  console.log({ email });
-  console.log({ password });
   try {
     const sql = `SELECT * FROM user WHERE email = "${email}"`;
-
     connection.query(sql, (err, result) => {
       console.log(result.length);
       if (err) throw err;
@@ -25,20 +22,19 @@ router.post("/", async (req, res) => {
               algorithm: "RS256",
             });
             res.cookie("token", token);
-            res.json(user);
+            res.send(user);
           } else {
-            res.status(400).json("Email et/ou mot de passe incorrect");
+            res.send(JSON.stringify(null));
           }
         } else {
-          res.status(400).json("Email et/ou mot de passe incorrect");
+          res.send(JSON.stringify(null));
         }
       } else {
-        console.log("test");
-        throw err;
+        res.send(JSON.stringify(null))
       }
     });
   } catch (error) {
-    res.status(400).json("Email et/ou mot de passe incorrect");
+    res.send(JSON.stringify(null));
   }
 });
 
@@ -50,7 +46,6 @@ router.get("/current", async (req, res) => {
       const decodedToken = jsonwebtoken.verify(token, keyPub);
       console.log({ decodedToken });
       const sql = `SELECT id_user, surname FROM user WHERE id_user = ${decodedToken.sub}`;
-
       connection.query(sql, (err, result) => {
         if (err) throw err;
         const currentUser = result[0];
@@ -64,7 +59,6 @@ router.get("/current", async (req, res) => {
       res.send(JSON.stringify(null));
     }
   } else {
-    console.log("test");
     res.send(JSON.stringify(null));
   }
 });
