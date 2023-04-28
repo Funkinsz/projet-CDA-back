@@ -9,17 +9,19 @@ router.post("/");
 router.post("/verifyUser", (req, res) => {
   const email = req.body.email;
 
+  console.log(email);
+
   const sql = `SELECT email FROM user WHERE email = "${email}"`;
 
   connection.query(sql, (err, result) => {
-    console.log(result.length);
     if (err) throw err;
-    if (result.length > 0) {
+    console.log(result[0]);
+    if (result[0]) {
       console.log("Utilisateur déja existant");
       res.send(JSON.stringify("user exist"));
     } else {
       console.log("user is null");
-      res.send(JSON.stringify("User is null"));
+      res.send(JSON.stringify("user is null"));
     }
   });
 });
