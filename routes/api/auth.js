@@ -45,7 +45,7 @@ router.get("/current", async (req, res) => {
     try {
       const decodedToken = jsonwebtoken.verify(token, keyPub);
       console.log({ decodedToken });
-      const sql = `SELECT id_user, surname FROM user WHERE id_user = ${decodedToken.sub}`;
+      const sql = `SELECT id_user, surname, name, firstname, email, born, profile_picture, banner_user, singer, city, travel_time, adress, desc_user, siret FROM user WHERE id_user = ${decodedToken.sub}`;
       connection.query(sql, (err, result) => {
         if (err) throw err;
         const currentUser = result[0];
