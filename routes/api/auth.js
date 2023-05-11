@@ -4,6 +4,9 @@ const router = require("express").Router();
 const connection = require("../../database/index");
 const { key, keyPub } = require("../../keys");
 
+const fs = require("fs");
+
+
 router.post("/", async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -49,6 +52,14 @@ router.get("/current", async (req, res) => {
       connection.query(sql, (err, result) => {
         if (err) throw err;
         const currentUser = result[0];
+        // const row = res[0];
+
+        // const data = row.data;
+        // console.log("blob data read");
+  
+        // const buff = new Buffer(data, "binary");
+  
+        // fs.writeFileSync(outputfile, buff);
         if (currentUser) {
           res.send(currentUser);
         } else {

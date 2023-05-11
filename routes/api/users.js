@@ -1,7 +1,7 @@
 const bcrypt = require("bcrypt");
 const connection = require("../../database/index");
 
-const fs = require('fs')
+const fs = require("fs");
 
 const router = require("express").Router();
 
@@ -82,7 +82,9 @@ router.post("/addUserPerso", async (req, res) => {
 
   const hashpswd = await bcrypt.hash(password, 8);
 
-  const sql = `INSERT INTO user(surname, name, firstname, email, password, born, profile_picture, user_type, city, travel_time) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+  const sql = `INSERT INTO 
+    user(surname, name, firstname, email, password, born, profile_picture, user_type, city, travel_time) 
+    VALUES("${surname}", "${name}", "${firstname}", "${email}", "${hashpswd}", ${date}, "${image}", "${status}", "${city}", "${travel}")`;
   const values = [
     surname,
     name,
@@ -104,17 +106,43 @@ router.post("/addUserPerso", async (req, res) => {
 });
 
 // INSERT IMG
-const multer = require("multer");
-const upload = multer({ dest: "uploads/" });
+router.post("/upload", async (req, res) => {
+  const image = req.body.image;
 
-router.set("view engine")
+  const inputfile = "profile.jpg";
+  const outputfile = "output.png";
 
-router.get("/upload", (req, res) => {
-  res.render("upload")
-})
+  const data = readImageFile(image);
 
-router.post("/upload", (req, res) => {
-  res.send("Image Uploaded")
-})
+  console.log(data);
+
+  const sql = `INSERT INTRO user(profile_picture) VALUES(${image})`;
+
+  connection.query(sql, function (err, res) {
+    if (err) throw err;
+
+    console.log("blob data inserted");
+
+    connection.query("SELECT * FROM binddata", function (err, res) {
+      const row = res[0];
+
+      const data = row.data;
+      console.log("blob data read");
+
+      // const buff = new Buffer(data, "binary");
+
+      fs.writeFileSync(outputfile, buff);
+
+      console.log("New file created", outputfile);
+    });
+  });
+
+  function readImageFile(file) {
+    // read binary dta from file
+    const bitmap = fs.readFileSync(file);
+    // const buff = new Buffer(bitmap);
+    return buff;
+  }
+});
 
 module.exports = router;
