@@ -37,10 +37,11 @@ router.post("/addUserPro", async (req, res) => {
   const adress = req.body.adress;
   const date = req.body.date;
   const status = req.body.status;
+  const image = req.body.image[0].name;
 
   const hashpswd = await bcrypt.hash(password, 8);
 
-  const sql = `INSERT INTO user(surname, name, firstname, email, password, born, user_type, city, adress) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+  const sql = `INSERT INTO user(surname, name, firstname, email, password, born, profile_picture, user_type, city, adress) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
   const values = [
     surname,
     name,
@@ -48,6 +49,7 @@ router.post("/addUserPro", async (req, res) => {
     email,
     hashpswd,
     date,
+    image,
     status,
     city,
     adress,
@@ -55,6 +57,7 @@ router.post("/addUserPro", async (req, res) => {
 
   connection.query(sql, values, (err, result) => {
     if (err) throw err;
+    console.log(image + "test");
     console.log("Utilisateur ajoutée en BDD");
     res.send(JSON.stringify("User is add"));
   });
@@ -71,10 +74,13 @@ router.post("/addUserPerso", async (req, res) => {
   const travel = req.body.travel;
   const date = req.body.date;
   const status = req.body.status;
+  const image = req.body.image;
+
+  console.log(image);
 
   const hashpswd = await bcrypt.hash(password, 8);
 
-  const sql = `INSERT INTO user(surname, name, firstname, email, password, born, user_type, city, travel_time) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+  const sql = `INSERT INTO user(surname, name, firstname, email, password, born, profile_picture, user_type, city, travel_time) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
   const values = [
     surname,
     name,
@@ -82,6 +88,7 @@ router.post("/addUserPerso", async (req, res) => {
     email,
     hashpswd,
     date,
+    image,
     status,
     city,
     travel,
