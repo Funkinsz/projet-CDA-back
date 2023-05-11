@@ -1,6 +1,8 @@
 const bcrypt = require("bcrypt");
 const connection = require("../../database/index");
 
+const fs = require('fs')
+
 const router = require("express").Router();
 
 router.post("/");
@@ -100,5 +102,19 @@ router.post("/addUserPerso", async (req, res) => {
     res.send(JSON.stringify("User is add"));
   });
 });
+
+// INSERT IMG
+const multer = require("multer");
+const upload = multer({ dest: "uploads/" });
+
+router.set("view engine")
+
+router.get("/upload", (req, res) => {
+  res.render("upload")
+})
+
+router.post("/upload", (req, res) => {
+  res.send("Image Uploaded")
+})
 
 module.exports = router;
