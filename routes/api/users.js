@@ -85,20 +85,8 @@ router.post("/addUserPerso", async (req, res) => {
   const sql = `INSERT INTO 
     user(surname, name, firstname, email, password, born, profile_picture, user_type, city, travel_time) 
     VALUES("${surname}", "${name}", "${firstname}", "${email}", "${hashpswd}", ${date}, "${image}", "${status}", "${city}", "${travel}")`;
-  const values = [
-    surname,
-    name,
-    firstname,
-    email,
-    hashpswd,
-    date,
-    image,
-    status,
-    city,
-    travel,
-  ];
 
-  connection.query(sql, values, (err, result) => {
+  connection.query(sql, (err, result) => {
     if (err) throw err;
     console.log("Utilisateur ajoutée en BDD");
     res.send(JSON.stringify("User is add"));
@@ -106,43 +94,5 @@ router.post("/addUserPerso", async (req, res) => {
 });
 
 // INSERT IMG
-router.post("/upload", async (req, res) => {
-  const image = req.body.image;
-
-  const inputfile = "profile.jpg";
-  const outputfile = "output.png";
-
-  const data = readImageFile(image);
-
-  console.log(data);
-
-  const sql = `INSERT INTRO user(profile_picture) VALUES(${image})`;
-
-  connection.query(sql, function (err, res) {
-    if (err) throw err;
-
-    console.log("blob data inserted");
-
-    connection.query("SELECT * FROM binddata", function (err, res) {
-      const row = res[0];
-
-      const data = row.data;
-      console.log("blob data read");
-
-      // const buff = new Buffer(data, "binary");
-
-      fs.writeFileSync(outputfile, buff);
-
-      console.log("New file created", outputfile);
-    });
-  });
-
-  function readImageFile(file) {
-    // read binary dta from file
-    const bitmap = fs.readFileSync(file);
-    // const buff = new Buffer(bitmap);
-    return buff;
-  }
-});
 
 module.exports = router;
