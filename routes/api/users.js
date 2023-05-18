@@ -94,5 +94,10 @@ router.post("/addUserPerso", async (req, res) => {
 });
 
 // INSERT IMG
+router.patch("/", async (req, res) => {
+  const { image, name } = req.body;
+  const { token } = req.cookies;
+
+})
 
 module.exports = router;

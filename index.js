@@ -22,10 +22,6 @@ const upload = multer({
   },
 });
 
-image: {
-  type: Buffer;
-}
-
 app.post(
   "/uplaod",
   upload.single("upload"),
