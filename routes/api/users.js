@@ -2,6 +2,7 @@ const bcrypt = require("bcrypt");
 const connection = require("../../database/index");
 
 const fs = require("fs");
+const { log } = require("console");
 
 const router = require("express").Router();
 
@@ -76,7 +77,13 @@ router.post("/addUserPerso", async (req, res) => {
   const travel = req.body.travel;
   const date = req.body.date;
   const status = req.body.status;
-  const image = req.body.image;
+
+  const image = ''
+
+  if (req.body.image != null) {
+    req.body.image = image;
+    console.log('test img');
+  }
 
   console.log(image);
 
@@ -92,12 +99,6 @@ router.post("/addUserPerso", async (req, res) => {
     console.log(result);
     res.send(JSON.stringify("User is add"));
   });
-});
-
-// INSERT IMG
-router.patch("/", async (req, res) => {
-  const { image, name } = req.body;
-  const { token } = req.cookies;
 });
 
 module.exports = router;

@@ -6,7 +6,6 @@ const { key, keyPub } = require("../../keys");
 
 const fs = require("fs");
 
-
 router.post("/", async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -17,6 +16,8 @@ router.post("/", async (req, res) => {
       if (result.length > 0) {
         console.log("connection ok");
         const user = result[0];
+
+        console.log("user : " + user.user_role);
         if (user) {
           if (bcrypt.compareSync(password, user.password)) {
             const token = jsonwebtoken.sign({}, key, {
@@ -24,7 +25,7 @@ router.post("/", async (req, res) => {
               expiresIn: 3600 * 24 * 30 * 6,
               algorithm: "RS256",
             });
-            res.cookie("token", token);
+            res.cookie("prestaToken", token);
             res.send(user);
           } else {
             res.send(JSON.stringify(null));
@@ -33,7 +34,7 @@ router.post("/", async (req, res) => {
           res.send(JSON.stringify(null));
         }
       } else {
-        res.send(JSON.stringify(null))
+        res.send(JSON.stringify(null));
       }
     });
   } catch (error) {
@@ -42,24 +43,33 @@ router.post("/", async (req, res) => {
 });
 
 router.get("/current", async (req, res) => {
-  const { token } = req.cookies;
-  console.log({ token });
-  if (token) {
+  const { prestaToken } = req.cookies;
+  const { prestaTokenAdmin } = req.cookies;
+  if (prestaToken) {
     try {
-      const decodedToken = jsonwebtoken.verify(token, keyPub);
+      const decodedToken = jsonwebtoken.verify(prestaToken, keyPub);
       console.log({ decodedToken });
-      const sql = `SELECT id_user, surname, name, firstname, email, born, profile_picture, banner_user, singer, city, travel_time, adress, desc_user, siret FROM user WHERE id_user = ${decodedToken.sub}`;
+      const sql = `SELECT id_user, surname, name, firstname, email, born, profile_picture, banner_user, singer, city, travel_time, adress, desc_user, siret, user_role FROM user WHERE id_user = ${decodedToken.sub}`;
       connection.query(sql, (err, result) => {
         if (err) throw err;
         const currentUser = result[0];
-        // const row = res[0];
-
-        // const data = row.data;
-        // console.log("blob data read");
-  
-        // const buff = new Buffer(data, "binary");
-  
-        // fs.writeFileSync(outputfile, buff);
+        if (currentUser) {
+          res.send(currentUser);
+        } else {
+          res.send(JSON.stringify(null));
+        }
+      });
+    } catch (error) {
+      res.send(JSON.stringify(null));
+    }
+  } else if (prestaTokenAdmin) {
+    try {
+      const decodedToken = jsonwebtoken.verify(prestaTokenAdmin, keyPub);
+      console.log({ decodedToken });
+      const sql = `SELECT id_user, surname, name, firstname, email, born, profile_picture, banner_user, singer, city, travel_time, adress, desc_user, siret, user_role FROM user WHERE id_user = ${decodedToken.sub}`;
+      connection.query(sql, (err, result) => {
+        if (err) throw err;
+        const currentUser = result[0];
         if (currentUser) {
           res.send(currentUser);
         } else {
@@ -75,7 +85,12 @@ router.get("/current", async (req, res) => {
 });
 
 router.delete("/", (req, res) => {
-  res.clearCookie("token");
+  res.clearCookie("prestaToken");
+  res.end();
+});
+
+router.delete("/admin", (req, res) => {
+  res.clearCookie("prestaTokenAdmin");
   res.end();
 });
 
