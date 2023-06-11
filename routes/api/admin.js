@@ -42,9 +42,24 @@ router.post("/", async (req, res) => {
 router.get("/getUsers", (req, res) => {
   connection.query("SELECT * FROM user", (err, result) => {
     if (err) throw err;
-    console.log(result);
-    res.send(JSON.stringify(result))
-  })
-})
+    // console.log(result);
+    res.send(JSON.stringify(result));
+  });
+});
+
+router.post("/updateUser", (req, res) => {
+  const { id_user, surname, email, name, firstname, type } = req.body;
+
+  console.log({ id_user, surname, email, name, firstname, type });
+
+  const sql = `UPDATE user SET surname = ?, email = ?, name = ?, firstname = ?, user_type = ? WHERE id_user = ?`;
+  const values = [surname, email, name, firstname, type, id_user];
+
+  connection.query(sql, values, (err, result) => {
+    if (err) throw err;
+    console.log("User Updated");
+    res.send(JSON.stringify(result));
+  });
+});
 
 module.exports = router;
