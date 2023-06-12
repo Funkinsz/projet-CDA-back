@@ -6,6 +6,7 @@ const { key, keyPub } = require("../../keys");
 
 const fs = require("fs");
 
+// AUTH
 router.post("/", async (req, res) => {
   const { email, password } = req.body;
 
@@ -39,10 +40,35 @@ router.post("/", async (req, res) => {
   }
 });
 
+router.get('/current', async (req, res) =>{
+  const { prestaTokenAdmin } = req.cookies
+
+  if (prestaTokenAdmin) {
+    try {
+      const decodedToken = jsonwebtoken.verify(prestaTokenAdmin, keyPub);
+      console.log({ decodedToken });
+      const sql = `SELECT id_user, surname, name, firstname, email, born, profile_picture, banner_user, singer, city, travel_time, adress, desc_user, siret, user_role FROM user WHERE id_user = ${decodedToken.sub}`;
+      connection.query(sql, (err, result) => {
+        if (err) throw err;
+        const currentUser = result[0];
+        if (currentUser) {
+          res.send(currentUser);
+        } else {
+          res.send(JSON.stringify(null));
+        }
+      });
+    } catch (error) {
+      res.send(JSON.stringify(null));
+    }
+  } else {
+    res.send(JSON.stringify(null));
+  }
+})
+
+// USERS
 router.get("/getUsers", (req, res) => {
   connection.query("SELECT * FROM user", (err, result) => {
     if (err) throw err;
-    // console.log(result);
     res.send(JSON.stringify(result));
   });
 });
@@ -62,4 +88,35 @@ router.post("/updateUser", (req, res) => {
   });
 });
 
+router.get("/banUser", (req, res) => {
+  const id = req.query.id
+  const role = req.query.role
+  console.log(role);
+
+  let newRole
+  if (role >= 0) {
+    newRole = -1
+  } else {
+    newRole = 0
+  }
+
+  console.log(newRole);
+
+  const sql = `UPDATE user SET user_role = ? WHERE id_user = ?`
+  const value = [newRole, id]
+
+  connection.query(sql, value, (err, result) => {
+    if (err) throw err;
+    console.log("User Banned");
+    res.send(JSON.stringify(result))
+  })
+})
+
+// ADDS
+router.get("/getAdds", (req, res) => {
+  connection.query("SELECT * FROM ad_pro", (err, result) => {
+    if (err) throw err;
+    res.send(JSON.stringify(result))
+  })
+})
 module.exports = router;

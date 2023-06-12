@@ -14,11 +14,10 @@ router.post("/", async (req, res) => {
       console.log(result.length);
       if (err) throw err;
       if (result.length > 0) {
-        console.log("connection ok");
         const user = result[0];
-
-        console.log("user : " + user.user_role);
-        if (user) {
+        if (user.user_role < 0) {
+          res.send(JSON.stringify("ban"))
+        } else if (user) {
           if (bcrypt.compareSync(password, user.password)) {
             const token = jsonwebtoken.sign({}, key, {
               subject: user.id_user.toString(),
@@ -44,27 +43,9 @@ router.post("/", async (req, res) => {
 
 router.get("/current", async (req, res) => {
   const { prestaToken } = req.cookies;
-  const { prestaTokenAdmin } = req.cookies;
   if (prestaToken) {
     try {
       const decodedToken = jsonwebtoken.verify(prestaToken, keyPub);
-      console.log({ decodedToken });
-      const sql = `SELECT id_user, surname, name, firstname, email, born, profile_picture, banner_user, singer, city, travel_time, adress, desc_user, siret, user_role FROM user WHERE id_user = ${decodedToken.sub}`;
-      connection.query(sql, (err, result) => {
-        if (err) throw err;
-        const currentUser = result[0];
-        if (currentUser) {
-          res.send(currentUser);
-        } else {
-          res.send(JSON.stringify(null));
-        }
-      });
-    } catch (error) {
-      res.send(JSON.stringify(null));
-    }
-  } else if (prestaTokenAdmin) {
-    try {
-      const decodedToken = jsonwebtoken.verify(prestaTokenAdmin, keyPub);
       console.log({ decodedToken });
       const sql = `SELECT id_user, surname, name, firstname, email, born, profile_picture, banner_user, singer, city, travel_time, adress, desc_user, siret, user_role FROM user WHERE id_user = ${decodedToken.sub}`;
       connection.query(sql, (err, result) => {
