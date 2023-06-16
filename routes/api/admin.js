@@ -9,7 +9,6 @@ const fs = require("fs");
 // AUTH
 router.post("/", async (req, res) => {
   const { email, password } = req.body;
-
   try {
     const sql = `SELECT * FROM user WHERE email = "${email}" AND user_role = 1`;
     connection.query(sql, (err, result) => {
@@ -52,7 +51,6 @@ router.get("/current", async (req, res) => {
       connection.query(sql, (err, result) => {
         if (err) throw err;
         const currentUser = result[0];
-        console.log(currentUser);
         if (currentUser) {
           res.send(currentUser);
         } else {
@@ -63,7 +61,6 @@ router.get("/current", async (req, res) => {
       res.send(JSON.stringify(null));
     }
   } else {
-    console.log("test");
     res.send(JSON.stringify(null));
   }
 });
