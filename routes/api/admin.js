@@ -156,4 +156,25 @@ router.get("/deleteAdd", (req, res) => {
   })
 })
 
+// STYLES
+router.get("/getStyles", (req, res) => {
+  connection.query("SELECT * FROM style ORDER BY name_style", (err, result) => {
+    if (err) throw err;
+    res.send(JSON.stringify(result))
+  })
+})
+
+router.post("/updateStyle", (req, res) => {
+  const {id, name } = req.body
+
+  console.log(req.body);
+  const sql = "UPDATE style SET name_style = ? WHERE id_style = ?"
+  const values = [name, id]
+
+  connection.query(sql, values, (err, result) => {
+    if (err) throw err;
+    res.send(JSON.stringify(result))
+  })
+})
+
 module.exports = router;
