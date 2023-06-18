@@ -42,11 +42,9 @@ router.post("/", async (req, res) => {
 router.get("/current", async (req, res) => {
   const { prestaTokenAdmin } = req.cookies;
 
-  console.log(prestaTokenAdmin);
   if (prestaTokenAdmin) {
     try {
       const decodedToken = jsonwebtoken.verify(prestaTokenAdmin, keyPub);
-      console.log({ decodedToken });
       const sql = `SELECT id_user, email, user_role FROM user WHERE id_user = ${decodedToken.sub}`;
       connection.query(sql, (err, result) => {
         if (err) throw err;
@@ -89,7 +87,6 @@ router.post("/updateUser", (req, res) => {
 router.get("/banUser", (req, res) => {
   const id = req.query.id;
   const role = req.query.role;
-  console.log(role);
 
   let newRole;
   if (role >= 0) {
@@ -97,8 +94,6 @@ router.get("/banUser", (req, res) => {
   } else {
     newRole = 0;
   }
-
-  console.log(newRole);
 
   const sql = `UPDATE user SET user_role = ? WHERE id_user = ?`;
   const value = [newRole, id];
@@ -128,8 +123,6 @@ router.post("/updateAdd", (req, res) => {
     s = 0;
   }
 
-  console.log(sono);
-
   const sql =
     "UPDATE ad_pro SET title_ad_pro = ?, content_ad_pro = ?, price_ad_pro = ?, sono = ?, number_art = ? WHERE id_ad_pro = ?";
   const value = [title, content, price, s, art, id];
@@ -142,39 +135,49 @@ router.post("/updateAdd", (req, res) => {
 });
 
 router.get("/deleteAdd", (req, res) => {
-  const id = req.query.id
+  const id = req.query.id;
 
-  console.log(req.query.id);
-
-  const sql = "DELETE FROM ad_pro WHERE id_ad_pro = ?"
-  const value = id
+  const sql = "DELETE FROM ad_pro WHERE id_ad_pro = ?";
+  const value = id;
 
   connection.query(sql, value, (err, result) => {
     if (err) throw err;
-    console.log('Add Deleted');
-    res.send(JSON.stringify(result))
-  })
-})
+    console.log("Add Deleted");
+    res.send(JSON.stringify(result));
+  });
+});
 
 // STYLES
 router.get("/getStyles", (req, res) => {
   connection.query("SELECT * FROM style ORDER BY name_style", (err, result) => {
     if (err) throw err;
-    res.send(JSON.stringify(result))
-  })
-})
+    res.send(JSON.stringify(result));
+  });
+});
 
 router.post("/updateStyle", (req, res) => {
-  const {id, name } = req.body
+  const { id, name } = req.body;
 
-  console.log(req.body);
-  const sql = "UPDATE style SET name_style = ? WHERE id_style = ?"
-  const values = [name, id]
+  const sql = "UPDATE style SET name_style = ? WHERE id_style = ?";
+  const values = [name, id];
 
   connection.query(sql, values, (err, result) => {
     if (err) throw err;
-    res.send(JSON.stringify(result))
-  })
-})
+    res.send(JSON.stringify(result));
+  });
+});
+
+router.post("/addStyle", (req, res) => {
+  const name = req.body.value;
+
+  console.log(name);
+
+  const sql = "INSERT INTO style (name_style) VALUE(?)";
+  connection.query(sql, name, (err, result) => {
+    if (err) throw err;
+    console.log("New Style Added");
+    res.send(JSON.stringify(result));
+  });
+});
 
 module.exports = router;
